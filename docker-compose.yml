@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: localhost
+      MYSQL_DATABASE: MyWebSite
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  nodejs:
+    build:
+      context: .
+      dockerfile: Dockerfile-nodeJs
+    container_name: nodejs-container
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./html:/app/html
+      - ./css:/app/css
+    depends_on:
+      - mysql
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-container
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+      - ./css:/usr/share/nginx/css
+    depends_on:
+      - nodejs
+
+volumes:
+  mysql-data:
